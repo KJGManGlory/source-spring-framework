@@ -412,7 +412,9 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		// 拿到 id 属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		// 拿到 name 属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
 		List<String> aliases = new ArrayList<>();
@@ -434,6 +436,7 @@ public class BeanDefinitionParserDelegate {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		// 解析生成 bd
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
@@ -504,6 +507,7 @@ public class BeanDefinitionParserDelegate {
 
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
+			// 获取 class
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 		String parent = null;
@@ -512,8 +516,10 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
+			// 创建 bd: 这一步主要设置 Class 对象, 设置类名称
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
+			// 解析 spring 的一些标签属性
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 

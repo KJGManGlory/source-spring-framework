@@ -145,8 +145,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			}
 		}
 
+		// 加载前的准备工作, 模板方法, 扩展点
 		preProcessXml(root);
+		// 解析加载 bd
 		parseBeanDefinitions(root, this.delegate);
+		// 加载后的处理工作, 模板方法, 扩展点
 		postProcessXml(root);
 
 		this.delegate = parent;
@@ -172,7 +175,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
+					// 判断标签是否是默认的标签, 扩展的标签走 else 逻辑
 					if (delegate.isDefaultNamespace(ele)) {
+						// 解析加载默认标签的元素
 						parseDefaultElement(ele, delegate);
 					}
 					else {
@@ -194,6 +199,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			processAliasRegistration(ele);
 		}
 		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
+			// 解析 bean 标签
 			processBeanDefinition(ele, delegate);
 		}
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
@@ -303,6 +309,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+		// 解析元素, 生成 bd
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);

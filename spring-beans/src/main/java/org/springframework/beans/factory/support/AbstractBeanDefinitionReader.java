@@ -184,7 +184,14 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
 		Assert.notNull(resources, "Resource array must not be null");
 		int count = 0;
+		// 多个配置, 循环加载
 		for (Resource resource : resources) {
+			/**
+			 * 此处支持三种加载方式
+			 * 1. xml
+			 * 2. properties
+			 * 3. groovy
+			 */
 			count += loadBeanDefinitions(resource);
 		}
 		return count;
@@ -221,6 +228,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			// Resource pattern matching available.
 			try {
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				// 继续加载配置, 生成 BeanDefinition
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);
@@ -253,6 +261,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
 		Assert.notNull(locations, "Location array must not be null");
 		int count = 0;
+		// 如果有多个配置, 则循环加载
 		for (String location : locations) {
 			count += loadBeanDefinitions(location);
 		}
