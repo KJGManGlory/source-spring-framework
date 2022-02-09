@@ -202,7 +202,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	//---------------------------------------------------------------------
 	// Implementation of BeanFactory interface
 	//---------------------------------------------------------------------
-
+	// 根据 Bean 的名称获取 Bean; 可以获取单例或者非单例的 Bean
 	@Override
 	public Object getBean(String name) throws BeansException {
 		return doGetBean(name, null, null, false);
@@ -245,7 +245,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @throws BeansException if the bean could not be created
 	 */
 	/**
-	 * 真正获取 Bean 的方法
+	 * 根据名称获取 Bean, 可以是单例 Bean, 也可以是非单例的 Bean
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(
@@ -256,6 +256,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object beanInstance;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		// 在一二三级缓存中查看该 Bean 是否已经创建了
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
@@ -332,9 +333,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				// Create bean instance.
+				// 创建单例 Bean
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
+							// 创建 Bean 的实例, 填充 Bean 的属性, 执行 Bean 的后置处理方法
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {

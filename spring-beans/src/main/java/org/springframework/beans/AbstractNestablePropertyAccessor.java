@@ -247,6 +247,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	@Override
+	// 设置属性值
 	public void setPropertyValue(PropertyValue pv) throws BeansException {
 		PropertyTokenHolder tokens = (PropertyTokenHolder) pv.resolvedTokens;
 		if (tokens == null) {
@@ -263,6 +264,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			if (nestedPa == this) {
 				pv.getOriginalPropertyValue().resolvedTokens = tokens;
 			}
+			// 设置属性值
 			nestedPa.setPropertyValue(tokens, pv);
 		}
 		else {
@@ -275,6 +277,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			processKeyedProperty(tokens, pv);
 		}
 		else {
+			// 设置属性值
 			processLocalProperty(tokens, pv);
 		}
 	}
@@ -414,6 +417,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		return propValue;
 	}
 
+	// 设置属性值
 	private void processLocalProperty(PropertyTokenHolder tokens, PropertyValue pv) {
 		PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
 		if (ph == null || !ph.isWritable()) {
@@ -460,6 +464,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				}
 				pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);
 			}
+			// 调用 setter 方法设置属性值
 			ph.setValue(valueToApply);
 		}
 		catch (TypeMismatchException ex) {

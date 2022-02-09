@@ -105,11 +105,14 @@ class BeanDefinitionValueResolver {
 	 * @return the resolved object
 	 */
 	@Nullable
+	// 获取对象属性的值, 必要时, 会创建对象为其属性赋值
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
+		// 如果属性的类型是 RuntimeBeanReference, 则需要创建对象
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			// Bean 的属性是一个 Bean 时, 需要调用 getBean 来取值
 			return resolveReference(argName, ref);
 		}
 		else if (value instanceof RuntimeBeanNameReference) {
@@ -299,6 +302,7 @@ class BeanDefinitionValueResolver {
 	 * Resolve a reference to another bean in the factory.
 	 */
 	@Nullable
+	// Bean 的属性是一个 Bean 时, 需要调用 getBean 来取值
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
 			Object bean;
@@ -327,6 +331,7 @@ class BeanDefinitionValueResolver {
 				}
 				else {
 					resolvedName = String.valueOf(doEvaluate(ref.getBeanName()));
+					// Bean 的属性是一个 Bean 时, 需要调用 getBean 来取值
 					bean = this.beanFactory.getBean(resolvedName);
 				}
 				this.beanFactory.registerDependentBean(resolvedName, this.beanName);

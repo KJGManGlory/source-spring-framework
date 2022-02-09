@@ -85,6 +85,7 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 	}
 
 	@Override
+	// 设置属性值
 	public void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown, boolean ignoreInvalid)
 			throws BeansException {
 
@@ -96,11 +97,13 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 			this.suppressNotWritablePropertyException = true;
 		}
 		try {
+			// 遍历所有的属性, 设置属性值
 			for (PropertyValue pv : propertyValues) {
 				// setPropertyValue may throw any BeansException, which won't be caught
 				// here, if there is a critical failure such as no matching field.
 				// We can attempt to deal only with less serious exceptions.
 				try {
+					// 设置属性值
 					setPropertyValue(pv);
 				}
 				catch (NotWritablePropertyException ex) {

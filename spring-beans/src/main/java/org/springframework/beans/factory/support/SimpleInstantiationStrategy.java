@@ -58,10 +58,12 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
 
 	@Override
+	// 通过反射的方式创建 Bean 的实例
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
 		if (!bd.hasMethodOverrides()) {
 			Constructor<?> constructorToUse;
+			// to-do 为什么需要加锁?
 			synchronized (bd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse == null) {

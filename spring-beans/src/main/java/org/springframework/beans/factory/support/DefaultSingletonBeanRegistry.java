@@ -75,13 +75,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 
 	/** Cache of singleton objects: bean name to bean instance. */
+	/** 一级缓存 **/
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
+	/** Cache of early singleton objects: bean name to bean instance. */
+	/** 二级缓存 **/
+	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
+
 	/** Cache of singleton factories: bean name to ObjectFactory. */
+	/** 三级缓存 **/
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
-	/** Cache of early singleton objects: bean name to bean instance. */
-	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
@@ -134,6 +138,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param singletonObject the singleton object
 	 */
+	// 对象初始化完成后, 将其添加到一级缓存中, 并移除二级和三级缓存中的对象
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
 			this.singletonObjects.put(beanName, singletonObject);
@@ -154,9 +159,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
+			// 一级缓存中如果没有该 Bean, 则执行如下操作
 			if (!this.singletonObjects.containsKey(beanName)) {
+				// 三级缓存: 添加 Bean 工厂
 				this.singletonFactories.put(beanName, singletonFactory);
+				// 将二级缓存中的半成品移除掉
 				this.earlySingletonObjects.remove(beanName);
+				// 将 Bean 的名称缓存起来
 				this.registeredSingletons.add(beanName);
 			}
 		}
@@ -177,22 +186,30 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
 	@Nullable
+	//
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
+		// 检查一级缓存中是否已经创建了该 Bean
 		Object singletonObject = this.singletonObjects.get(beanName);
+		// 如果没有创建, 并且该 Bean 在创建中
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			// 检查二级缓存中是否存在该 Bean
 			singletonObject = this.earlySingletonObjects.get(beanName);
 			if (singletonObject == null && allowEarlyReference) {
+				// to-do 为啥要给 ConcurrentHashMap 再加个锁
 				synchronized (this.singletonObjects) {
 					// Consistent creation of early reference within full singleton lock
 					singletonObject = this.singletonObjects.get(beanName);
 					if (singletonObject == null) {
 						singletonObject = this.earlySingletonObjects.get(beanName);
 						if (singletonObject == null) {
+							// 三级缓存中如果有该 Bean 的工厂方法, 则直接执行 getObject 方法获取 Bean
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							if (singletonFactory != null) {
 								singletonObject = singletonFactory.getObject();
+								// to-do 为啥不直接放到一级缓存中?
 								this.earlySingletonObjects.put(beanName, singletonObject);
+								// 移除三级缓存中的工厂
 								this.singletonFactories.remove(beanName);
 							}
 						}

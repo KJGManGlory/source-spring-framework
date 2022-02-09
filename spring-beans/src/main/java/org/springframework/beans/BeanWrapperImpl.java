@@ -310,6 +310,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 		}
 
 		@Override
+		// 调用 setter 方法设置属性值
 		public void setValue(@Nullable Object value) throws Exception {
 			Method writeMethod = (this.pd instanceof GenericTypeAwarePropertyDescriptor ?
 					((GenericTypeAwarePropertyDescriptor) this.pd).getWriteMethodForActualAccess() :
@@ -329,6 +330,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 			}
 			else {
 				ReflectionUtils.makeAccessible(writeMethod);
+				// 调用 setter 方法设置属性值
 				writeMethod.invoke(getWrappedInstance(), value);
 			}
 		}

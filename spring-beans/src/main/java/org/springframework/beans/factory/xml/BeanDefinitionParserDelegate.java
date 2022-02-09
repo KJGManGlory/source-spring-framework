@@ -507,7 +507,7 @@ public class BeanDefinitionParserDelegate {
 
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
-			// 获取 class
+			// 获取 class 属性
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 		String parent = null;
