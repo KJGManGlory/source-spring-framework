@@ -181,6 +181,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			this.instantiationStrategy = new SimpleInstantiationStrategy();
 		}
 		else {
+			// 默认使用 cglib 动态代理
 			this.instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 		}
 	}
@@ -565,6 +566,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (instanceWrapper == null) {
 			// 通过反射的方式创建了一个实例, 但是并没有给该实例的属性赋值
+			// 默认使用 cglib
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		// 获取 Bean 实例
@@ -599,6 +601,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						"' to allow for resolving potential circular references");
 			}
 			// 在三级缓存中缓存 Bean 工厂
+			// 三级缓存解决 aop
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -608,6 +611,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 填充 Bean 的属性
 			populateBean(beanName, mbd, instanceWrapper);
 			// 完成实例化 Bean(比如设置 BeanFactory)
+			// 调用 aware 接口的方法
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -1220,6 +1224,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// No special handling: simply use no-arg constructor.
+		// 默认使用无参构造器进行实例化
 		return instantiateBean(beanName, mbd);
 	}
 
@@ -1315,6 +1320,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						getAccessControlContext());
 			}
 			else {
+				// 进行实例化, 默认策略使用 cglib
 				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, this);
 			}
 			BeanWrapper bw = new BeanWrapperImpl(beanInstance);

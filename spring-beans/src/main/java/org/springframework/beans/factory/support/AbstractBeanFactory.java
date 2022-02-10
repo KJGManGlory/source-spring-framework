@@ -274,6 +274,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
+			// 如果Bean 不是单例, 循环依赖直接抛出异常
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
@@ -335,6 +336,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// Create bean instance.
 				// 创建单例 Bean
 				if (mbd.isSingleton()) {
+					// 获取单例 Bean, 如果获取不到, 则调用 ObjectFactory#getObject 进行创建
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							// 创建 Bean 的实例, 填充 Bean 的属性, 执行 Bean 的后置处理方法
@@ -348,6 +350,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
+					// 获取具体对象,
 					beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 

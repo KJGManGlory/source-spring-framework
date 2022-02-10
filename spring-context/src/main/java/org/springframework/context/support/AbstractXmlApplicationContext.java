@@ -129,6 +129,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 			reader.loadBeanDefinitions(configResources);
 		}
 		// 创建容器是指定了配置文件的路径, 通过路径的方式进行加载配置
+		// 一开始的时候设置路径, 所以在这里可以拿到
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			reader.loadBeanDefinitions(configLocations);

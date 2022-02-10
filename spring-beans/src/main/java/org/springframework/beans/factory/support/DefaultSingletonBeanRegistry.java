@@ -156,15 +156,35 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param singletonFactory the factory for the singleton object
 	 */
+	// 将 Bean 的 ObjectFactory 放入到三级缓存中
+//	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
+//		Assert.notNull(singletonFactory, "Singleton factory must not be null");
+//		synchronized (this.singletonObjects) {
+//			// 一级缓存中如果没有该 Bean, 则执行如下操作
+//			if (!this.singletonObjects.containsKey(beanName)) {
+//				// 三级缓存: 添加 Bean 工厂
+//				this.singletonFactories.put(beanName, singletonFactory);
+//				// 将二级缓存中的半成品移除掉
+//				this.earlySingletonObjects.remove(beanName);
+//				// 将 Bean 的名称缓存起来
+//				this.registeredSingletons.add(beanName);
+//			}
+//		}
+//	}
+
+	/**
+	 * lizza-code: 自定义的方法, 验证普通对象可以不使用三级缓存
+	 * @param beanName
+	 * @param singletonFactory
+	 * @return void
+	 */
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
 			// 一级缓存中如果没有该 Bean, 则执行如下操作
 			if (!this.singletonObjects.containsKey(beanName)) {
-				// 三级缓存: 添加 Bean 工厂
-				this.singletonFactories.put(beanName, singletonFactory);
-				// 将二级缓存中的半成品移除掉
-				this.earlySingletonObjects.remove(beanName);
+				// 二级缓存: 将对象缓存到二级缓存中
+				this.earlySingletonObjects.put(beanName, singletonFactory.getObject());
 				// 将 Bean 的名称缓存起来
 				this.registeredSingletons.add(beanName);
 			}
@@ -186,7 +206,6 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
 	@Nullable
-	//
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
 		// 检查一级缓存中是否已经创建了该 Bean
@@ -220,6 +239,23 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		return singletonObject;
 	}
 
+//	/**
+//	 * 自定义的方法: 验证普通对象不需要使用三级缓存
+//	 * @param beanName
+//	 * @param allowEarlyReference
+//	 * @return java.lang.Object
+//	 */
+//	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+//		// 检查一级缓存中是否已经创建了该 Bean
+//		Object singletonObject = this.singletonObjects.get(beanName);
+//		// 如果没有创建, 并且该 Bean 在创建中
+//		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+//			// 检查二级缓存中是否存在该 Bean 二级中有就直接返回
+//			singletonObject = this.earlySingletonObjects.get(beanName);
+//		}
+//		return singletonObject;
+//	}
+
 	/**
 	 * Return the (raw) singleton object registered under the given name,
 	 * creating and registering a new one if none registered yet.
@@ -241,6 +277,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				// 单例创建之前检查更新状态
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -271,9 +308,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					// 单例创建之后检查更新状态
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
+					// 循环依赖
 					addSingleton(beanName, singletonObject);
 				}
 			}
