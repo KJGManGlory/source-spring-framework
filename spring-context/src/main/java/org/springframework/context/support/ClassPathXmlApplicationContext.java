@@ -137,10 +137,12 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
-
+		// 设置 ResourceLoader 用来解析资源文件
 		super(parent);
+		// 解析, 设置配置文件的路径, 如果配置文件中有 ${} 这样的占位符, 则进行变量替换
 		setConfigLocations(configLocations);
 		if (refresh) {
+			// 容器刷新
 			refresh();
 		}
 	}

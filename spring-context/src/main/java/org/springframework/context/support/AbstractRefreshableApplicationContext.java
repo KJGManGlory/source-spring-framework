@@ -65,9 +65,11 @@ import org.springframework.lang.Nullable;
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
 	@Nullable
+	// 是否允许覆盖 BeanDefinition
 	private Boolean allowBeanDefinitionOverriding;
 
 	@Nullable
+	// 是否允许自动解决循环依赖
 	private Boolean allowCircularReferences;
 
 	/** Bean factory for this context. */
@@ -217,6 +219,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
+	// 如果需要扩展则覆写该方法
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);

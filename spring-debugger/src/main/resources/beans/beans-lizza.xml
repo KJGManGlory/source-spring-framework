@@ -4,7 +4,7 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
         https://www.springframework.org/schema/beans/spring-beans.xsd">
 	<bean name="user" class="org.springframework.debugger.beans.User">
-		<property name="name" value="张三"></property>
+		<property name="name" value="lizza"></property>
 		<property name="age" value="12"></property>
 	</bean>
 </beans>

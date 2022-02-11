@@ -36,6 +36,7 @@ import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -204,6 +205,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private final AtomicBoolean closed = new AtomicBoolean();
 
 	/** Synchronization monitor for the "refresh" and "destroy". */
+	// 锁, 保证容器的刷新和销毁是原子操作
 	private final Object startupShutdownMonitor = new Object();
 
 	/** Reference to the JVM shutdown hook, if registered. */
@@ -501,6 +503,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see ConfigurableEnvironment#merge(ConfigurableEnvironment)
 	 */
 	@Override
+	// 父子容器的环境变量 merge
 	public void setParent(@Nullable ApplicationContext parent) {
 		this.parent = parent;
 		if (parent != null) {
@@ -560,6 +563,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 * 4、获 Environment 对象, 并加载当前统的属性值到 Environment 对象中
 			 * 5、准备监听器和事件的集合对象, 数认为空的集合
 			 */
+
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
@@ -573,11 +577,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				// 注册一些特殊的 BeanPostProcessor, 扩展点
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 				// Invoke factory processors registered as beans in the context.
-				// 执行 BeanFactoryPostProcessors
+				// 执行 BeanFactoryPostProcessors, B
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -655,13 +660,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 初始化属性值, 留给子类扩展
+		// to-do 典型扩展点: 比如 WebApplicationContextUtils#initServletPropertySources
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+		// 校验属性值是否完整, 如果缺失, 则报异常 MissingRequiredPropertiesException
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
+		// 监听器
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}

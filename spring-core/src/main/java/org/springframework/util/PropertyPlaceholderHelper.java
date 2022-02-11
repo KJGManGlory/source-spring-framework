@@ -123,11 +123,12 @@ public class PropertyPlaceholderHelper {
 		Assert.notNull(value, "'value' must not be null");
 		return parseStringValue(value, placeholderResolver, null);
 	}
-
+	// 解析配置文件名称, 如果有占位符, 则进行解析替换
 	protected String parseStringValue(
 			String value, PlaceholderResolver placeholderResolver, @Nullable Set<String> visitedPlaceholders) {
 
 		int startIndex = value.indexOf(this.placeholderPrefix);
+		// 如果名称中带有 { [ 这些符号, 就会进行解析
 		if (startIndex == -1) {
 			return value;
 		}
@@ -136,6 +137,7 @@ public class PropertyPlaceholderHelper {
 		while (startIndex != -1) {
 			int endIndex = findPlaceholderEndIndex(result, startIndex);
 			if (endIndex != -1) {
+				// 前缀
 				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex);
 				String originalPlaceholder = placeholder;
 				if (visitedPlaceholders == null) {
@@ -146,6 +148,7 @@ public class PropertyPlaceholderHelper {
 							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
 				}
 				// Recursive invocation, parsing placeholders contained in the placeholder key.
+				// 递归调用, 解析多层嵌套的占位符
 				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
 				// Now obtain the value for the fully resolved key...
 				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
@@ -164,6 +167,7 @@ public class PropertyPlaceholderHelper {
 					// Recursive invocation, parsing placeholders contained in the
 					// previously resolved placeholder value.
 					propVal = parseStringValue(propVal, placeholderResolver, visitedPlaceholders);
+					// 字符串替换
 					result.replace(startIndex, endIndex + this.placeholderSuffix.length(), propVal);
 					if (logger.isTraceEnabled()) {
 						logger.trace("Resolved placeholder '" + placeholder + "'");

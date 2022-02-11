@@ -56,7 +56,7 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 
-	// 执行 Bean 的后置处理器
+	// 执行 BeanFactoryPostProcessors
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 

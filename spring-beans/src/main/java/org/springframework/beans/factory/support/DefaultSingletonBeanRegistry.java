@@ -84,6 +84,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	/** 三级缓存 **/
+	// to-do 为啥第三级缓存不使用 ConcurrentHashMap
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 

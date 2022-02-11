@@ -75,6 +75,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * {@code SPRING_PROFILES_ACTIVE}.
 	 * @see ConfigurableEnvironment#setActiveProfiles
 	 */
+	// profiles
 	public static final String ACTIVE_PROFILES_PROPERTY_NAME = "spring.profiles.active";
 
 	/**
@@ -437,6 +438,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
+	// 获取
 	public Map<String, Object> getSystemProperties() {
 		try {
 			return (Map) System.getProperties();
