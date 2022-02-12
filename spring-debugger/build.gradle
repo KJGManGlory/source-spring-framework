@@ -11,5 +11,6 @@ repositories {
 
 dependencies {
     implementation group: 'junit', name: 'junit', version: '4.10'
+    implementation group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.5'
     implementation(project(":spring-context"))
 }

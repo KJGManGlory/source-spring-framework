@@ -142,6 +142,8 @@ public class XmlReaderContext extends ReaderContext {
 	 * @see org.springframework.beans.factory.support.BeanNameGenerator#generateBeanName
 	 * @see BeanDefinitionRegistry#registerBeanDefinition
 	 */
+	// 1. 生成 beanName
+	// 2. 将 BeanDefinition 注册到容器中
 	public String registerWithGeneratedName(BeanDefinition beanDefinition) {
 		String generatedName = generateBeanName(beanDefinition);
 		getRegistry().registerBeanDefinition(generatedName, beanDefinition);

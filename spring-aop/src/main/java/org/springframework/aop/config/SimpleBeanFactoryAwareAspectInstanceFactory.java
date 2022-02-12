@@ -33,6 +33,7 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @since 2.0
  */
+// BeanFactoryAware 接口帮助获取 BeanFactory 对象
 public class SimpleBeanFactoryAwareAspectInstanceFactory implements AspectInstanceFactory, BeanFactoryAware {
 
 	@Nullable

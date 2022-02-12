@@ -124,6 +124,7 @@ public abstract class BeanDefinitionReaderUtils {
 		}
 
 		// Top-level bean: use plain class name with unique suffix if necessary.
+		// 如果不是内部类, 则 beanName 的格式为: outerBeanClassName#1
 		return uniqueBeanName(generatedBeanName, registry);
 	}
 
@@ -142,6 +143,7 @@ public abstract class BeanDefinitionReaderUtils {
 
 		// Increase counter until the id is unique.
 		String prefix = beanName + GENERATED_BEAN_NAME_SEPARATOR;
+		// 遍历 bean 工厂, 找到不重名的 beanName
 		while (counter == -1 || registry.containsBeanDefinition(id)) {
 			counter++;
 			id = prefix + counter;

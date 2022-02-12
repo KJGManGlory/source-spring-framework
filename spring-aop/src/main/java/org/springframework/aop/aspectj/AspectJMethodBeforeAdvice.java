@@ -32,10 +32,17 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements MethodBeforeAdvice, Serializable {
 
+	/**
+	 * aspectJBeforeAdviceMethod: advice 方法
+	 * pointcut: 切点, 一般是一个表达式
+	 * aspectInstanceFactory: 创建 aspect 实例的工厂
+	 */
 	public AspectJMethodBeforeAdvice(
-			Method aspectJBeforeAdviceMethod, AspectJExpressionPointcut pointcut, AspectInstanceFactory aif) {
+			Method aspectJBeforeAdviceMethod,
+			AspectJExpressionPointcut pointcut,
+			AspectInstanceFactory aspectInstanceFactory) {
 
-		super(aspectJBeforeAdviceMethod, pointcut, aif);
+		super(aspectJBeforeAdviceMethod, pointcut, aspectInstanceFactory);
 	}
 
 

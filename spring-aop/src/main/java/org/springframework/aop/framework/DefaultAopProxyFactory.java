@@ -50,6 +50,7 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 
 	@Override
+	// aop 代理
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
 		if (!NativeDetector.inNativeImage() &&
 				(config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config))) {

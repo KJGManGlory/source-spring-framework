@@ -391,7 +391,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		try {
 			// 解析成 document 文档
 			Document doc = doLoadDocument(inputSource, resource);
-			// 遍历元素开始加载
+			// 遍历元素, 解析标签, 开始加载
 			int count = registerBeanDefinitions(doc, resource);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Loaded " + count + " bean definitions from " + resource);

@@ -82,9 +82,11 @@ public abstract class AopConfigUtils {
 	}
 
 	@Nullable
+	// xml 的方法配置 aop
 	public static BeanDefinition registerAspectJAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
 
+		// 将 AspectJAwareAdvisorAutoProxyCreator BeanDefinition 注册到容器中, 用于后续创建 aop 代理对象
 		return registerOrEscalateApcAsRequired(AspectJAwareAdvisorAutoProxyCreator.class, registry, source);
 	}
 
@@ -94,9 +96,11 @@ public abstract class AopConfigUtils {
 	}
 
 	@Nullable
+	// 注解的方式配置 aop
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
 
+		// 将 AnnotationAwareAspectJAutoProxyCreator 注册到容器中, 用于后续创建 aop 代理对象
 		return registerOrEscalateApcAsRequired(AnnotationAwareAspectJAutoProxyCreator.class, registry, source);
 	}
 

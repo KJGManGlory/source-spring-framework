@@ -1,0 +1,19 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="userService" class="org.springframework.debugger.aop.UserService"></bean>
+
+    <bean id="logger" class="org.springframework.debugger.aop.Logger"></bean>
+    
+    <aop:config>
+        <aop:aspect id="logAdvice" ref="logger">
+			<aop:pointcut id="logPointCut" expression="execution(* org.springframework.debugger.aop.UserService..*())"/>
+            <aop:before method="record" pointcut-ref="logPointCut"></aop:before>
+        </aop:aspect>
+    </aop:config>
+</beans>

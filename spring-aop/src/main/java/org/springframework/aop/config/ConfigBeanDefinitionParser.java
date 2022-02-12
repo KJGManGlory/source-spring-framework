@@ -98,11 +98,14 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 	@Override
 	@Nullable
+	// 解析 aop 相关的标签, 生成对应的 BeanDefinition
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		CompositeComponentDefinition compositeDef =
 				new CompositeComponentDefinition(element.getTagName(), parserContext.extractSource(element));
+		// 元素入队
 		parserContext.pushContainingComponent(compositeDef);
 
+		// 创建, 注册 advisor 类型的 BeanPostProcessor: AspectJAwareAdvisorAutoProxyCreator (继承关系)
 		configureAutoProxyCreator(parserContext, element);
 
 		List<Element> childElts = DomUtils.getChildElements(element);
@@ -118,8 +121,9 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 				parseAspect(elt, parserContext);
 			}
 		}
-
+		// 元素出队
 		parserContext.popAndRegisterContainingComponent();
+		// to-do 为什么不直接返回 bd?
 		return null;
 	}
 
@@ -214,8 +218,11 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			// ordering semantics right.
 			NodeList nodeList = aspectElement.getChildNodes();
 			boolean adviceFoundAlready = false;
+
+			// 循环遍历解析 advice 类型的元素
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
+				// 判断元素是否是通知类型的元素 before, after, after-returning, after-throwing, around
 				if (isAdviceNode(node, parserContext)) {
 					if (!adviceFoundAlready) {
 						adviceFoundAlready = true;
@@ -227,6 +234,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 						}
 						beanReferences.add(new RuntimeBeanReference(aspectName));
 					}
+					// 核心方法: 解析 advice 类型的对象
 					AbstractBeanDefinition advisorDefinition = parseAdvice(
 							aspectName, i, aspectElement, (Element) node, parserContext, beanDefinitions, beanReferences);
 					beanDefinitions.add(advisorDefinition);
@@ -239,6 +247,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 			List<Element> pointcuts = DomUtils.getChildElementsByTagName(aspectElement, POINTCUT);
 			for (Element pointcutElement : pointcuts) {
+				// 解析 pointcut 标签, 构建 pointcut 的 BeanDefinition 对象, 并将其注册到容器中
 				parsePointcut(pointcutElement, parserContext);
 			}
 
@@ -312,6 +321,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	 * BeanDefinition with the supplied BeanDefinitionRegistry.
 	 * @return the generated advice RootBeanDefinition
 	 */
+	// 解析 advice 对象(即通知类型的对象)
 	private AbstractBeanDefinition parseAdvice(
 			String aspectName, int order, Element aspectElement, Element adviceElement, ParserContext parserContext,
 			List<BeanDefinition> beanDefinitions, List<BeanReference> beanReferences) {
@@ -320,25 +330,30 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			this.parseState.push(new AdviceEntry(parserContext.getDelegate().getLocalName(adviceElement)));
 
 			// create the method factory bean
+			// 解析 advice 节点中的 method 属性
 			RootBeanDefinition methodDefinition = new RootBeanDefinition(MethodLocatingFactoryBean.class);
 			methodDefinition.getPropertyValues().add("targetBeanName", aspectName);
 			methodDefinition.getPropertyValues().add("methodName", adviceElement.getAttribute("method"));
 			methodDefinition.setSynthetic(true);
 
 			// create instance factory definition
+			// 构建 aspect 工厂对象, 类型为: SimpleBeanFactoryAwareAspectInstanceFactory
 			RootBeanDefinition aspectFactoryDef =
 					new RootBeanDefinition(SimpleBeanFactoryAwareAspectInstanceFactory.class);
 			aspectFactoryDef.getPropertyValues().add("aspectBeanName", aspectName);
 			aspectFactoryDef.setSynthetic(true);
 
 			// register the pointcut
+			// 构建 advice 对象, 其中构建了 method 对象和 point-cut 对象(是个字符串)
 			AbstractBeanDefinition adviceDef = createAdviceDefinition(
 					adviceElement, parserContext, aspectName, order, methodDefinition, aspectFactoryDef,
 					beanDefinitions, beanReferences);
 
 			// configure the advisor
+			// 构建 advisor 对象, 包裹 advice
 			RootBeanDefinition advisorDefinition = new RootBeanDefinition(AspectJPointcutAdvisor.class);
 			advisorDefinition.setSource(parserContext.extractSource(adviceElement));
+			// 将 advice 包裹起来
 			advisorDefinition.getConstructorArgumentValues().addGenericArgumentValue(adviceDef);
 			if (aspectElement.hasAttribute(ORDER_PROPERTY)) {
 				advisorDefinition.getPropertyValues().add(
@@ -346,6 +361,8 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			}
 
 			// register the final advisor
+			// 生成 advisor 的 beanName, 并且将其注册到容器中
+			// beanName 的格式: org.springframework.aop.aspectj.AspectJPointcutAdvisor#0
 			parserContext.getReaderContext().registerWithGeneratedName(advisorDefinition);
 
 			return advisorDefinition;
@@ -361,11 +378,13 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	 * This same pointcut is also configured as the pointcut for the enclosing
 	 * Advisor definition using the supplied MutablePropertyValues.
 	 */
+	// 创建 advice 类型的 BeanDefinition
 	private AbstractBeanDefinition createAdviceDefinition(
 			Element adviceElement, ParserContext parserContext, String aspectName, int order,
 			RootBeanDefinition methodDef, RootBeanDefinition aspectFactoryDef,
 			List<BeanDefinition> beanDefinitions, List<BeanReference> beanReferences) {
 
+		// 通过 getAdviceClass 方法获取到具体的 advice 类型, 然后包装成 advice 的 BeanDefinition
 		RootBeanDefinition adviceDefinition = new RootBeanDefinition(getAdviceClass(adviceElement, parserContext));
 		adviceDefinition.setSource(parserContext.extractSource(adviceElement));
 
@@ -385,9 +404,17 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 					ARG_NAMES_PROPERTY, adviceElement.getAttribute(ARG_NAMES));
 		}
 
+		/**
+		 * 构建具体的 advice 对象所需要的参数(比如: AspectJMethodBeforeAdvice 类型的对象)
+		 * 一共有三个:
+		 * aspectJBeforeAdviceMethod: advice 方法
+		 * pointcut: 切点, 一般是一个表达式
+		 * aspectInstanceFactory: 创建 aspect 实例的工厂
+		 */
 		ConstructorArgumentValues cav = adviceDefinition.getConstructorArgumentValues();
 		cav.addIndexedArgumentValue(METHOD_INDEX, methodDef);
 
+		// 解析 pointcut
 		Object pointcut = parsePointcutProperty(adviceElement, parserContext);
 		if (pointcut instanceof BeanDefinition) {
 			cav.addIndexedArgumentValue(POINTCUT_INDEX, pointcut);
@@ -441,6 +468,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 		try {
 			this.parseState.push(new PointcutEntry(id));
+			// 创建 pointcut BeanDefinition, 类型为: AspectJExpressionPointcut
 			pointcutDefinition = createPointcutDefinition(expression);
 			pointcutDefinition.setSource(parserContext.extractSource(pointcutElement));
 
@@ -449,6 +477,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 				parserContext.getRegistry().registerBeanDefinition(pointcutBeanName, pointcutDefinition);
 			}
 			else {
+				// 将 pointcut BeanDefinition 注册到容器中
 				pointcutBeanName = parserContext.getReaderContext().registerWithGeneratedName(pointcutDefinition);
 			}
 
@@ -504,8 +533,10 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	 * Creates a {@link BeanDefinition} for the {@link AspectJExpressionPointcut} class using
 	 * the supplied pointcut expression.
 	 */
+	// 创建 pointcut BeanDefinition 对象, 注意: 是原型模式
 	protected AbstractBeanDefinition createPointcutDefinition(String expression) {
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(AspectJExpressionPointcut.class);
+		// 原型模式
 		beanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
 		beanDefinition.setSynthetic(true);
 		beanDefinition.getPropertyValues().add(EXPRESSION, expression);
