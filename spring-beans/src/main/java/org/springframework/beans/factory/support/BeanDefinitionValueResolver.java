@@ -132,8 +132,10 @@ class BeanDefinitionValueResolver {
 		else if (value instanceof BeanDefinition) {
 			// Resolve plain BeanDefinition, without contained name: use dummy name.
 			BeanDefinition bd = (BeanDefinition) value;
+			// 构建 innerBean 的名称
 			String innerBeanName = "(inner bean)" + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR +
 					ObjectUtils.getIdentityHexString(bd);
+			// 构建 Bean 对象, AOP 中, AspectJPointcutAdvisor 对象的构造器是一个 Advice 的对象(如: AspectJMethodBeforeAdvice 对象), 此时需要先创建该 advice 对象
 			return resolveInnerBean(argName, innerBeanName, bd);
 		}
 		else if (value instanceof DependencyDescriptor) {
@@ -364,6 +366,7 @@ class BeanDefinitionValueResolver {
 			// add counter - increasing the counter until the name is unique.
 			String actualInnerBeanName = innerBeanName;
 			if (mbd.isSingleton()) {
+				// 检查 innerBean 的 name, 确保名称是唯一的
 				actualInnerBeanName = adaptInnerBeanName(innerBeanName);
 			}
 			this.beanFactory.registerContainedBean(actualInnerBeanName, this.beanName);
@@ -376,6 +379,7 @@ class BeanDefinitionValueResolver {
 				}
 			}
 			// Actually create the inner bean instance now...
+			// 创建 innerBean 对象 (比如创建 AspectJMethodBeforeAdvice 对象)
 			Object innerBean = this.beanFactory.createBean(actualInnerBeanName, mbd, null);
 			if (innerBean instanceof FactoryBean) {
 				boolean synthetic = mbd.isSynthetic();

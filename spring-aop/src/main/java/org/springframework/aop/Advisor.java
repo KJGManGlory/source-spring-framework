@@ -33,6 +33,10 @@ import org.aopalliance.aop.Advice;
  * @author Rod Johnson
  * @author Juergen Hoeller
  */
+// 用来管理 advice 和 pointCut 的容器
+// 主要有两个子接口: PointcutAdvisor 和 IntroductionAdvisor
+// PointcutAdvisor 作用于方法层面
+// IntroductionAdvisor 作用于类层面
 public interface Advisor {
 
 	/**

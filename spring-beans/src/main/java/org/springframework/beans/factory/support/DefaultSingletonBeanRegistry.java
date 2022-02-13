@@ -158,20 +158,20 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param singletonFactory the factory for the singleton object
 	 */
 	// 将 Bean 的 ObjectFactory 放入到三级缓存中
-//	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
-//		Assert.notNull(singletonFactory, "Singleton factory must not be null");
-//		synchronized (this.singletonObjects) {
-//			// 一级缓存中如果没有该 Bean, 则执行如下操作
-//			if (!this.singletonObjects.containsKey(beanName)) {
-//				// 三级缓存: 添加 Bean 工厂
-//				this.singletonFactories.put(beanName, singletonFactory);
-//				// 将二级缓存中的半成品移除掉
-//				this.earlySingletonObjects.remove(beanName);
-//				// 将 Bean 的名称缓存起来
-//				this.registeredSingletons.add(beanName);
-//			}
-//		}
-//	}
+	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
+		Assert.notNull(singletonFactory, "Singleton factory must not be null");
+		synchronized (this.singletonObjects) {
+			// 一级缓存中如果没有该 Bean, 则执行如下操作
+			if (!this.singletonObjects.containsKey(beanName)) {
+				// 三级缓存: 添加 Bean 工厂
+				this.singletonFactories.put(beanName, singletonFactory);
+				// 将二级缓存中的半成品移除掉
+				this.earlySingletonObjects.remove(beanName);
+				// 将 Bean 的名称缓存起来
+				this.registeredSingletons.add(beanName);
+			}
+		}
+	}
 
 	/**
 	 * lizza-code: 自定义的方法, 验证普通对象可以不使用三级缓存
@@ -179,18 +179,18 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param singletonFactory
 	 * @return void
 	 */
-	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
-		Assert.notNull(singletonFactory, "Singleton factory must not be null");
-		synchronized (this.singletonObjects) {
-			// 一级缓存中如果没有该 Bean, 则执行如下操作
-			if (!this.singletonObjects.containsKey(beanName)) {
-				// 二级缓存: 将对象缓存到二级缓存中
-				this.earlySingletonObjects.put(beanName, singletonFactory.getObject());
-				// 将 Bean 的名称缓存起来
-				this.registeredSingletons.add(beanName);
-			}
-		}
-	}
+//	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
+//		Assert.notNull(singletonFactory, "Singleton factory must not be null");
+//		synchronized (this.singletonObjects) {
+//			// 一级缓存中如果没有该 Bean, 则执行如下操作
+//			if (!this.singletonObjects.containsKey(beanName)) {
+//				// 二级缓存: 将对象缓存到二级缓存中
+//				this.earlySingletonObjects.put(beanName, singletonFactory.getObject());
+//				// 将 Bean 的名称缓存起来
+//				this.registeredSingletons.add(beanName);
+//			}
+//		}
+//	}
 
 	@Override
 	@Nullable
@@ -313,7 +313,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					// 循环依赖
+					// 循环依赖; 非循环依赖时, 此方法将 Bean 添加到一级缓存
 					addSingleton(beanName, singletonObject);
 				}
 			}

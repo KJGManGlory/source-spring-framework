@@ -114,6 +114,7 @@ import org.springframework.lang.Nullable;
  * @see DisposableBean#destroy
  * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
  */
+// spring Bean 工厂的顶级接口
 public interface BeanFactory {
 
 	/**

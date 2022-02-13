@@ -433,7 +433,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	@Override
-	// BeanPostProcessor 的后置处理器
+	// BeanPostProcessor 的后置处理器, 创建 Aop 代理对象
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
@@ -516,7 +516,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
-			// aop 核心方法: 调用该方法, 创建一个代理对象
+			// 核心方法: 如果需要返回一个代理对象, 则会使用 BeanPostProcessors 来创建一个代理对象
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -571,7 +571,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (instanceWrapper == null) {
 			// 通过反射的方式创建了一个实例, 但是并没有给该实例的属性赋值
-			// 默认使用 cglib
+			// 如果是有参构造器, 且参数是其他 Bean 对象, 则会递归执行先构造完所有构造器需要的 Bean 对象, 然后进行原始 Bean 的创建工作
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		// 获取 Bean 实例
@@ -605,8 +605,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			// 在三级缓存中缓存 Bean 工厂
-			// 三级缓存解决 aop
+			// 将 Bean 工厂添加到三级缓存中, 什么时候用呢? 在 getSingleton 时, 将其移入一级缓存
+			// 三级缓存解决 aop: 如果对象是代理对象, 则返回一个代理对象替换原始对象
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 
@@ -981,6 +981,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+			// 如果是 aop 代理
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
 				exposedObject = bp.getEarlyBeanReference(exposedObject, beanName);
 			}
@@ -1219,9 +1220,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Candidate constructors for autowiring?
+		// 确定给定 bean 要使用的候选构造函数, 检查所有已注册的 SmartInstantiationAwareBeanPostProcessors
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
+			// 使用构造器的方式创建 Bean, 创建时, 可能需要先构建构造器所需的参数
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
@@ -1298,6 +1301,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor#determineCandidateConstructors
 	 */
 	@Nullable
+	// 确定给定 bean 要使用的候选构造函数, 检查所有已注册的 SmartInstantiationAwareBeanPostProcessors
 	protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(@Nullable Class<?> beanClass, String beanName)
 			throws BeansException {
 
@@ -1711,7 +1715,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					}
 					originalValue = new DependencyDescriptor(new MethodParameter(writeMethod, 0), true);
 				}
-				// 获取对象属性的值, 必要时, 会创建对象为其属性赋值
+				// 核心方法: 获取对象属性的值, 必要时, 会创建对象为其属性赋值
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				Object convertedValue = resolvedValue;
 				boolean convertible = bw.isWritableProperty(propertyName) &&

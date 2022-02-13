@@ -57,6 +57,7 @@ public abstract class AspectJProxyUtils {
 				}
 			}
 			if (foundAspectJAdvice && !advisors.contains(ExposeInvocationInterceptor.ADVISOR)) {
+				// 	设置 MethodInvocation 对象, 方便后续使用
 				advisors.add(0, ExposeInvocationInterceptor.ADVISOR);
 				return true;
 			}
