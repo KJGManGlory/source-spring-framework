@@ -806,6 +806,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		}
 
 		DefaultTransactionStatus defStatus = (DefaultTransactionStatus) status;
+		// 事务回滚
 		processRollback(defStatus, false);
 	}
 
@@ -832,6 +833,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 					if (status.isDebug()) {
 						logger.debug("Initiating transaction rollback");
 					}
+					// 事务回滚
 					doRollback(status);
 				}
 				else {
