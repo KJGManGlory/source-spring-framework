@@ -1,6 +1,6 @@
-DROP TABLE user IF EXISTS;
+DROP TABLE message IF EXISTS;
 
-CREATE TABLE user (
+CREATE TABLE message (
   name VARCHAR(20) NOT NULL,
   PRIMARY KEY(name)
 );

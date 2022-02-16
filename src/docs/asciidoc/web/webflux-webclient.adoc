@@ -876,7 +876,7 @@ a filter for basic authentication through a static factory method:
 	import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
 	WebClient client = WebClient.builder()
-			.filter(basicAuthentication("user", "password"))
+			.filter(basicAuthentication("message", "password"))
 			.build();
 ----
 [source,kotlin,indent=0,subs="verbatim,quotes",role="secondary"]
@@ -885,7 +885,7 @@ a filter for basic authentication through a static factory method:
 	import org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication
 
 	val client = WebClient.builder()
-			.filter(basicAuthentication("user", "password"))
+			.filter(basicAuthentication("message", "password"))
 			.build()
 ----
 
@@ -900,7 +900,7 @@ that inserts a basic authentication filter at index 0:
 
 	WebClient client = webClient.mutate()
 			.filters(filterList -> {
-				filterList.add(0, basicAuthentication("user", "password"));
+				filterList.add(0, basicAuthentication("message", "password"));
 			})
 			.build();
 ----
@@ -908,7 +908,7 @@ that inserts a basic authentication filter at index 0:
 .Kotlin
 ----
 	val client = webClient.mutate()
-			.filters { it.add(0, basicAuthentication("user", "password")) }
+			.filters { it.add(0, basicAuthentication("message", "password")) }
 			.build()
 ----
 

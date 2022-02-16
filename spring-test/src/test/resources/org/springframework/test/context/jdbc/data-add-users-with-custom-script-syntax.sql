@@ -9,7 +9,7 @@ INSERT
 
 INTO
 
-user
+message
 
 VALUES('Dilbert')
 
@@ -18,8 +18,8 @@ VALUES('Dilbert')
 ` custom single-line comment
 
 
-INSERT INTO user VALUES('Dogbert')@@
+INSERT INTO message VALUES('Dogbert')@@
 
 %% another custom single-line comment
 
-INSERT INTO user VALUES('Catbert')@@
+INSERT INTO message VALUES('Catbert')@@

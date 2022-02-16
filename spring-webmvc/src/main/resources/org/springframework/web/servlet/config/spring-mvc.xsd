@@ -576,7 +576,7 @@
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 	Adds a "private" directive in the Cache-Control header.
-	This indicates that the response is intended for a single user and may not be stored by shared caches.
+	This indicates that the response is intended for a single message and may not be stored by shared caches.
 					]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -1246,7 +1246,7 @@
 						<xsd:attribute name="location" type="xsd:string" use="required">
 							<xsd:annotation>
 								<xsd:documentation><![CDATA[
-	The location of the script to be loaded by the script engine (library or user provided).
+	The location of the script to be loaded by the script engine (library or message provided).
 								]]></xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
@@ -1415,7 +1415,7 @@
 
 	NOTE: Be aware that this option establishes a high
 	level of trust with the configured domains and also increases the surface
-	attack of the web application by exposing sensitive user-specific
+	attack of the web application by exposing sensitive message-specific
 	information such as cookies and CSRF tokens.
 
 	By default this is not set in which case the

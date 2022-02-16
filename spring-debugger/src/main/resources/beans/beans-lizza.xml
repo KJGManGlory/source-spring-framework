@@ -3,7 +3,7 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
         https://www.springframework.org/schema/beans/spring-beans.xsd">
-	<bean name="user" class="org.springframework.debugger.beans.User">
+	<bean name="message" class="org.springframework.debugger.beans.User">
 		<property name="name" value="lizza"></property>
 		<property name="age" value="12"></property>
 	</bean>

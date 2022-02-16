@@ -1,1 +1,1 @@
-INSERT INTO user VALUES('Dilbert');
+INSERT INTO message VALUES('Dilbert');

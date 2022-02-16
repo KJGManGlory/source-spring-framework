@@ -1157,7 +1157,7 @@ specified type (`DataAccessException`, in this case).
 ====
 Note that `@AfterThrowing` does not indicate a general exception handling callback.
 Specifically, an `@AfterThrowing` advice method is only supposed to receive exceptions
-from the join point (user-declared target method) itself but not from an accompanying
+from the join point (message-declared target method) itself but not from an accompanying
 `@After`/`@AfterReturning` method.
 ====
 
@@ -1205,7 +1205,7 @@ purposes. The following example shows how to use after finally advice:
 ====
 Note that `@After` advice in AspectJ is defined as "after finally advice", analogous
 to a finally block in a try-catch statement. It will be invoked for any outcome,
-normal return or exception thrown from the join point (user-declared target method),
+normal return or exception thrown from the join point (message-declared target method),
 in contrast to `@AfterReturning` which only applies to successful normal returns.
 ====
 
@@ -1500,7 +1500,7 @@ expressions to declared parameter names in advice and pointcut method signatures
 Parameter names are not available through Java reflection, so Spring AOP uses the
 following strategy to determine parameter names:
 
-* If the parameter names have been explicitly specified by the user, the specified
+* If the parameter names have been explicitly specified by the message, the specified
   parameter names are used. Both the advice and the pointcut annotations have
   an optional `argNames` attribute that you can use to specify the argument names of
   the annotated method. These argument names are available at runtime. The following example
@@ -1807,7 +1807,7 @@ something useful.
 The execution of business services can sometimes fail due to concurrency issues (for
 example, a deadlock loser). If the operation is retried, it is likely to succeed
 on the next try. For business services where it is appropriate to retry in such
-conditions (idempotent operations that do not need to go back to the user for conflict
+conditions (idempotent operations that do not need to go back to the message for conflict
 resolution), we want to transparently retry the operation to avoid the client seeing a
 `PessimisticLockingFailureException`. This is a requirement that clearly cuts across
 multiple services in the service layer and, hence, is ideal for implementing through an
@@ -2707,7 +2707,7 @@ This section shows how the concurrent locking failure retry example from
 The execution of business services can sometimes fail due to concurrency issues (for
 example, a deadlock loser). If the operation is retried, it is likely to succeed
 on the next try. For business services where it is appropriate to retry in such
-conditions (idempotent operations that do not need to go back to the user for conflict
+conditions (idempotent operations that do not need to go back to the message for conflict
 resolution), we want to transparently retry the operation to avoid the client seeing a
 `PessimisticLockingFailureException`. This is a requirement that clearly cuts across
 multiple services in the service layer and, hence, is ideal for implementing through an
