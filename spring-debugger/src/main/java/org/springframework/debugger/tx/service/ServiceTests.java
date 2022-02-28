@@ -21,6 +21,41 @@ public class ServiceTests {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		messageService.print(1);
+	}
+
+	@Test
+	public void test2() {
+		try {
+			messageService.fun3();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void test3() {
+		try {
+			messageService.fun4();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void test4() {
+		try {
+			messageService.fun6();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void test5() {
+		try {
+			messageService.fun12();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }

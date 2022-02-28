@@ -19,8 +19,8 @@ public class MessageDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
-    public int insert(Message message) {
-        return jdbcTemplate.update("insert into message (msg, version) values (?, ?)", message.getMsg(), message.getVersion());
+    public int insert(String message) {
+        return jdbcTemplate.update("insert into message (msg, version) values (?, 1)", message);
     }
 
     public int delete(int id) {
